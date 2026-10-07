@@ -30,8 +30,8 @@ st.markdown(
             linear-gradient(180deg, #f6f9fd 0%, #eef3f9 100%);
         color: var(--ink);
     }
-    [data-testid="stHeader"] { background: rgba(246,249,253,.72); }
-    .block-container { max-width:1440px; padding-top:1.2rem; padding-bottom:3rem; }
+    [data-testid="stHeader"] { background:transparent !important; box-shadow:none !important; }
+    .block-container { max-width:1440px; padding-top:4.5rem; padding-bottom:3rem; }
     section[data-testid="stSidebar"] {
         background:linear-gradient(180deg,#071b3b 0%,#0b2d58 100%);
         border-right:1px solid rgba(255,255,255,.08);
