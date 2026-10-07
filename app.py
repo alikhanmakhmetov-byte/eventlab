@@ -71,26 +71,36 @@ st.markdown(
         background:#fff; border:1px solid var(--line); border-radius:16px; padding:15px 17px;
         box-shadow:0 4px 14px rgba(17,43,78,.04);
     }
-    div[data-testid="stMetricLabel"], div[data-testid="stMetricLabel"] p {
-        color:#52677f !important; font-weight:650; opacity:1 !important;
+    div[data-testid="stMetric"] [data-testid="stMetricLabel"],
+    div[data-testid="stMetric"] [data-testid="stMetricLabel"] *,
+    div[data-testid="stMetric"] label,
+    div[data-testid="stMetric"] p {
+        color:#405670 !important; font-weight:650 !important; opacity:1 !important;
     }
     div[data-testid="stMetricValue"], div[data-testid="stMetricValue"] div {
         color:#0b2851 !important; opacity:1 !important;
     }
-    .stTabs [data-baseweb="tab-list"] { gap:.38rem; border-bottom:1px solid #dce5f0; }
-    .stTabs [data-baseweb="tab"] {
-        background:#e8eef6; border-radius:12px 12px 0 0; padding:.65rem 1rem;
-        color:#38536f !important; border-bottom:2px solid transparent; font-weight:650;
+    [data-testid="stTabs"] [data-baseweb="tab-list"] { gap:.38rem; border-bottom:1px solid #dce5f0; }
+    [data-testid="stTabs"] button[data-baseweb="tab"],
+    [data-testid="stTabs"] [role="tab"],
+    .stTabs button[data-baseweb="tab"] {
+        background:#e8eef6 !important; border-radius:10px 10px 0 0; padding:.65rem 1rem;
+        color:#38536f !important; font-weight:650 !important; opacity:1 !important;
     }
-    .stTabs [data-baseweb="tab"] *, .stTabs [data-baseweb="tab"] p {
+    [data-testid="stTabs"] button[data-baseweb="tab"] *,
+    [data-testid="stTabs"] [role="tab"] *,
+    .stTabs button[data-baseweb="tab"] * {
         color:#38536f !important; opacity:1 !important;
     }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        background:#fff !important; color:#0b2851 !important; border-bottom-color:#12b8c8;
+    [data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"],
+    [data-testid="stTabs"] [role="tab"][aria-selected="true"] {
+        background:#fff !important; color:#0b2851 !important; opacity:1 !important;
     }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] * {
+    [data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] *,
+    [data-testid="stTabs"] [role="tab"][aria-selected="true"] * {
         color:#0b2851 !important; opacity:1 !important;
     }
+    [data-testid="stTabs"] [data-baseweb="tab-highlight"] { background:#13b8c8 !important; }
     .stTabs [data-baseweb="tab-panel"] { padding-top:1.15rem; }
     h2, h3 { color:#0d2a50; letter-spacing:-.02em; }
     div[data-testid="stAlert"] { border-radius:14px; }
