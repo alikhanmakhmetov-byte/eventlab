@@ -173,6 +173,27 @@ with st.container(border=True):
         st.caption("k = the exact number of overloaded servers in the outcome being studied.")
     st.caption("These settings update every section. The simulation compares the model with 20,000 generated one-minute outcomes.")
 
+p_column, assumptions_column = st.columns([1.2, 0.8])
+with p_column:
+    with st.container(border=True):
+        st.markdown("### How can we get p?")
+        st.write(
+            "In this educational model, p is an assumed probability. In a real system, "
+            "p can be estimated from historical server data. An observation means one server "
+            "recorded over one time interval."
+        )
+        st.latex(r"p = \frac{\text{number of overloads}}{\text{number of observations}}")
+        st.write("For example: 120 overloads / 1,000 observations = 0.12 = 12%.")
+with assumptions_column:
+    with st.container(border=True):
+        st.markdown("### Model assumptions")
+        st.markdown(
+            "- All servers have the same overload probability.\n"
+            "- Server results are independent.\n"
+            "- Each trial is independent.\n"
+            "- This is an educational model, not real server monitoring."
+        )
+
 tab_combinatorics, tab_simulation, tab_events, tab_formulas = st.tabs(
     ["Combinatorics", "Simulation", "Events", "Formulas"]
 )
@@ -321,6 +342,25 @@ with tab_simulation:
     observed_counts = np.bincount(samples, minlength=node_count + 1)
     observed_shares = observed_counts / SIMULATION_TRIALS
     model_shares = [binomial_probability(node_count, r, overload_rate) for r in outcomes]
+    selected_theory = model_shares[exact_count]
+    selected_simulation = observed_shares[exact_count]
+    selected_difference_pp = (selected_simulation - selected_theory) * 100
+
+    with st.container(border=True):
+        st.markdown("#### Selected outcome")
+        st.write(f"Exactly **{exact_count}** servers overloaded")
+        selected_theory_col, selected_simulation_col, selected_difference_col = st.columns(3)
+        selected_theory_col.metric("Theory", f"{selected_theory:.2%}")
+        selected_simulation_col.metric("Simulation", f"{selected_simulation:.2%}")
+        selected_difference_col.metric(
+            "Difference (simulation − theory)",
+            f"{selected_difference_pp:+.2f} percentage points",
+        )
+        st.caption(
+            f"Simulation is the share of {SIMULATION_TRIALS:,} trials with exactly k = {exact_count} overloaded servers. "
+            "The difference is simulation minus theory."
+        )
+
     comparison_fig = go.Figure()
     comparison_fig.add_trace(
         go.Bar(
