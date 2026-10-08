@@ -57,6 +57,16 @@ st.markdown(
     div[data-testid="stMetricValue"], div[data-testid="stMetricValue"] div {
         color:#0b2851 !important; opacity:1 !important;
     }
+    [data-testid="stSlider"] [data-testid="stWidgetLabel"],
+    [data-testid="stSlider"] [data-testid="stWidgetLabel"] *,
+    [data-testid="stSlider"] label,
+    [data-testid="stSlider"] label * {
+        color:#0b2851 !important; opacity:1 !important; font-weight:650 !important;
+    }
+    div[data-testid="stCaptionContainer"],
+    div[data-testid="stCaptionContainer"] * {
+        color:#38536f !important; opacity:1 !important;
+    }
     [data-testid="stTabs"] [data-baseweb="tab-list"] { gap:.38rem; border-bottom:1px solid #dce5f0; }
     [data-testid="stTabs"] button[data-baseweb="tab"],
     [data-testid="stTabs"] [role="tab"],
@@ -148,17 +158,20 @@ with st.container(border=True):
             "Number of servers (n)", min_value=2, max_value=20, value=8, step=1,
             help="n is the total number of servers in the cluster.",
         )
+        st.caption("n = the total number of servers in the cluster.")
     with control_p:
         overload_rate = st.slider(
             "Overload chance per server (p)", min_value=0.01, max_value=0.99, value=0.12, step=0.01, format="%.2f",
             help="p is the chance that one server overloads during one hypothetical minute. For example, 0.12 means 12%.",
         )
+        st.caption("p = the probability one server overloads in one hypothetical minute; 0.12 means 12%.")
     with control_k:
         exact_count = st.slider(
             "Exact overloaded servers (k)", min_value=0, max_value=node_count, value=min(2, node_count),
             help="k is the exact number of overloaded servers in the outcome being studied.",
         )
-    st.caption("The selected n, p, and k values update every section. The simulation uses a fixed sample of 20,000 computer-generated trials.")
+        st.caption("k = the exact number of overloaded servers in the outcome being studied.")
+    st.caption("These settings update every section. The simulation compares the model with 20,000 generated one-minute outcomes.")
 
 tab_combinatorics, tab_simulation, tab_events, tab_formulas = st.tabs(
     ["Combinatorics", "Simulation", "Events", "Formulas"]
