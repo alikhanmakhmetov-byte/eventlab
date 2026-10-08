@@ -150,7 +150,7 @@ with st.container(border=True):
         )
     with control_p:
         overload_rate = st.slider(
-            "Overload chance per server (p)", min_value=0.01, max_value=0.50, value=0.12, step=0.01, format="%.2f",
+            "Overload chance per server (p)", min_value=0.01, max_value=0.99, value=0.12, step=0.01, format="%.2f",
             help="p is the chance that one server overloads during one hypothetical minute. For example, 0.12 means 12%.",
         )
     with control_k:
