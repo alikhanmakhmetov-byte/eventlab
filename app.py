@@ -12,7 +12,7 @@ st.set_page_config(
     page_title="EventLab | Probability Lab",
     page_icon="◉",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 st.markdown(
@@ -32,29 +32,6 @@ st.markdown(
     }
     [data-testid="stHeader"] { background:transparent !important; box-shadow:none !important; }
     .block-container { max-width:1440px; padding-top:4.5rem; padding-bottom:3rem; }
-    section[data-testid="stSidebar"] {
-        background:linear-gradient(180deg,#071b3b 0%,#0b2d58 100%);
-        border-right:1px solid rgba(255,255,255,.08);
-    }
-    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,
-    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h1,
-    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2,
-    section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3,
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
-        color:#eaf3ff !important;
-    }
-    section[data-testid="stSidebar"] [data-testid="stCaptionContainer"] p { color:#a9bfd9 !important; }
-    section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p { color:#edf5ff !important; }
-    .brand-lockup { display:flex; align-items:center; gap:10px; margin:.35rem 0 1.35rem; }
-    .brand-mark {
-        width:34px; height:34px; border-radius:11px; display:grid; place-items:center;
-        color:white; font-size:19px; font-weight:800;
-        background:linear-gradient(135deg,#15c4d0,#3278c5);
-        box-shadow:0 0 24px rgba(19,184,200,.35);
-    }
-    .brand-name { color:#f6fbff; font-weight:800; letter-spacing:.09em; font-size:.9rem; }
-    .brand-sub { color:#9eb7d5; font-size:.68rem; letter-spacing:.14em; margin-top:2px; }
     .hero {
         position:relative; overflow:hidden; isolation:isolate;
         padding:1.35rem 1.7rem; border-radius:18px; margin-bottom:.9rem;
@@ -132,6 +109,9 @@ def binomial_probability(total_nodes: int, overloaded_nodes: int, probability: f
     )
 
 
+SIMULATION_TRIALS = 20_000
+
+
 def chart_layout(fig: go.Figure, height: int = 360) -> go.Figure:
     fig.update_layout(
         template="plotly_white",
@@ -148,41 +128,6 @@ def chart_layout(fig: go.Figure, height: int = 360) -> go.Figure:
     return fig
 
 
-with st.sidebar:
-    st.markdown(
-        """
-        <div class="brand-lockup">
-          <div class="brand-mark">∿</div>
-          <div><div class="brand-name">EVENTLAB</div><div class="brand-sub">PROBABILITY LAB</div></div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.markdown("### Model controls")
-    node_count = st.slider(
-        "Server nodes (n)", min_value=2, max_value=20, value=8, step=1,
-        help="n is the total number of servers in the cluster.",
-    )
-    overload_rate = st.slider(
-        "Overload chance per server (p)", min_value=0.01, max_value=0.50, value=0.12, step=0.01, format="%.2f",
-        help="p is the chance that one server overloads during one simulated minute. For example, p = 0.12 means 12%.",
-    )
-    exact_count = st.slider(
-        "Exactly overloaded servers (k)", min_value=0, max_value=node_count, value=min(2, node_count),
-        help="k is the exact number of overloaded servers in the outcome being studied.",
-    )
-    simulation_rounds = st.slider(
-        "Simulated minutes (m)", min_value=100, max_value=100_000, value=20_000, step=100, format="%d",
-        help="m is the number of computer-generated trials. Each is one hypothetical minute, not real elapsed time.",
-    )
-    st.markdown("---")
-    st.caption("Change a setting to update the calculations and charts across all four sections.")
-    st.markdown(
-        '<div class="footnote">Model assumption: every server has the same overload chance, and servers act independently.</div>',
-        unsafe_allow_html=True,
-    )
-
-
 st.markdown(
     """
     <div class="hero">
@@ -194,6 +139,26 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+with st.container(border=True):
+    st.subheader("Set the model")
+    control_n, control_p, control_k = st.columns(3)
+    with control_n:
+        node_count = st.slider(
+            "Number of servers (n)", min_value=2, max_value=20, value=8, step=1,
+            help="n is the total number of servers in the cluster.",
+        )
+    with control_p:
+        overload_rate = st.slider(
+            "Overload chance per server (p)", min_value=0.01, max_value=0.50, value=0.12, step=0.01, format="%.2f",
+            help="p is the chance that one server overloads during one hypothetical minute. For example, 0.12 means 12%.",
+        )
+    with control_k:
+        exact_count = st.slider(
+            "Exact overloaded servers (k)", min_value=0, max_value=node_count, value=min(2, node_count),
+            help="k is the exact number of overloaded servers in the outcome being studied.",
+        )
+    st.caption("The selected n, p, and k values update every section. The simulation uses a fixed sample of 20,000 computer-generated trials.")
 
 tab_combinatorics, tab_simulation, tab_events, tab_formulas = st.tabs(
     ["Combinatorics", "Simulation", "Events", "Formulas"]
@@ -301,11 +266,11 @@ with tab_simulation:
         f"because the expected count is n × p = {node_count} × {overload_rate:.2f}."
     )
 
-    st.markdown("#### What does ‘simulated minutes’ mean?")
+    st.markdown("#### What is one simulation trial?")
     st.write(
-        f"m = {simulation_rounds:,} computer-generated trials. Each trial represents one hypothetical minute: "
+        f"The simulation uses {SIMULATION_TRIALS:,} computer-generated trials. Each trial represents one hypothetical one-minute snapshot: "
         "the program independently decides whether each server overloads, then counts the overloaded servers. "
-        "These are not real minutes, real traffic, or measurements from a live server."
+        "These are not real elapsed minutes, real traffic, or measurements from a live server."
     )
     diagram_one, arrow_one, diagram_two, arrow_two, diagram_three = st.columns([1, 0.12, 1, 0.12, 1])
     with diagram_one:
@@ -317,17 +282,17 @@ with tab_simulation:
     with arrow_two:
         st.markdown("### →")
     with diagram_three:
-        st.markdown(f'<div class="formula-card"><h3>3 · Repeat m times</h3><p>Compare the observed outcomes with the formula.</p></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="formula-card"><h3>3 · Repeat 20,000 times</h3><p>Compare the observed outcomes with the formula.</p></div>', unsafe_allow_html=True)
 
     refresh_simulation = st.button("Generate a new random sample", type="primary")
-    simulation_key = (node_count, round(overload_rate, 4), simulation_rounds)
+    simulation_key = (node_count, round(overload_rate, 4))
     if (
         refresh_simulation
         or st.session_state.get("simulation_key") != simulation_key
         or "simulation_samples" not in st.session_state
     ):
         rng = np.random.default_rng()
-        st.session_state["simulation_samples"] = rng.binomial(node_count, overload_rate, size=simulation_rounds)
+        st.session_state["simulation_samples"] = rng.binomial(node_count, overload_rate, size=SIMULATION_TRIALS)
         st.session_state["simulation_key"] = simulation_key
 
     samples = st.session_state["simulation_samples"]
@@ -341,7 +306,7 @@ with tab_simulation:
     st.caption("The mean is the average count per trial. The median is the middle count after sorting all trials. Standard deviation describes how spread out the counts are.")
 
     observed_counts = np.bincount(samples, minlength=node_count + 1)
-    observed_shares = observed_counts / simulation_rounds
+    observed_shares = observed_counts / SIMULATION_TRIALS
     model_shares = [binomial_probability(node_count, r, overload_rate) for r in outcomes]
     comparison_fig = go.Figure()
     comparison_fig.add_trace(
@@ -382,7 +347,7 @@ with tab_simulation:
         }
     )
     st.markdown("#### Frequency table")
-    st.caption("Each row is an overload count. ‘Observed trials’ counts how often it occurred in the m computer-generated trials. Shares are percentages; the gap is observed minus theoretical, measured in percentage points.")
+    st.caption(f"Each row is an overload count. ‘Observed trials’ counts how often it occurred in the {SIMULATION_TRIALS:,} computer-generated trials. Shares are percentages; the gap is observed minus theoretical, measured in percentage points.")
     st.dataframe(
         comparison.style.format(
             {
@@ -396,7 +361,7 @@ with tab_simulation:
     )
     st.caption(
         "Interpretation: observed bars will not match the theory perfectly in a finite run. "
-        "As the number of simulated minutes grows, the frequencies usually move closer to the model."
+        "With more trials, the observed frequencies usually move closer to the theoretical probabilities."
     )
 
 
@@ -465,7 +430,7 @@ with tab_formulas:
         (
             "Expected count and spread",
             r"\mathbb{E}[X]=np,\qquad \operatorname{Var}(X)=np(1-p),\qquad \sigma=\sqrt{np(1-p)}",
-            "np is the expected average count per simulated minute; σ describes the typical spread around that average.",
+            "np is the expected average count per trial; σ describes the typical spread around that average.",
         ),
         (
             "Conditional probability",
@@ -476,11 +441,6 @@ with tab_formulas:
             "Independent events",
             r"\Pr(A\cap B)=\Pr(A)\Pr(B)",
             "The probability that both events occur when neither changes the chance of the other.",
-        ),
-        (
-            "Empirical frequency",
-            r"\widehat{\Pr}(X=k)=\frac{\text{trials with }X=k}{m}",
-            "Estimates the chance of exactly k overloads: count how many of the m simulated minutes had that result, then divide by m.",
         ),
     ]
 
@@ -499,15 +459,14 @@ with tab_formulas:
             ("n", str(node_count), "Total number of servers in the cluster"),
             ("p", f"{overload_rate:.2f} = {overload_rate:.0%}", "Chance one server overloads during one hypothetical minute"),
             ("k", str(exact_count), "Exact number of overloaded servers in the outcome being studied"),
-            ("m", f"{simulation_rounds:,}", "Number of simulated minutes (independent computer-generated trials)"),
-            ("X", "0, 1, …, n", "Count of overloaded servers in one simulated minute"),
+            ("X", "0, 1, …, n", "Count of overloaded servers in one trial"),
             ("A", "X ≥ 1", "Event that one or more servers overload"),
         ],
         columns=["Symbol", "Current value", "Meaning"],
     )
     st.dataframe(symbol_table, use_container_width=True, hide_index=True)
     st.markdown(
-        '<div class="footnote">Assumptions: every server uses the same p, server outcomes are independent within a minute, and simulated minutes are independent. '
+        '<div class="footnote">Assumptions: every server uses the same p, server outcomes are independent within a trial, and trials are independent. '
         "Real servers can affect one another, so the model is a simplified teaching example.</div>",
         unsafe_allow_html=True,
     )
